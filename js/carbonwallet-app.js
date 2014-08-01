@@ -2,11 +2,11 @@
 var timeout;
 
 $(document).ready(function() {
-
   $('#site').hide();
   $('#tx').hide();
   $('#decrypt-url').hide();
   $('#your-addresses').hide();
+  $('#shuffle').hide();
   $('#logout-menu').hide();
 
   // Add instawallet style URLS. Only we use a hash
@@ -111,6 +111,13 @@ $(document).ready(function() {
     return false;
   });
 
+  $('#request-shuffle-nav').click(function(){
+    hideAll();
+    $('#shuffle').show();
+    $('#request-shuffle-nav').parent().addClass('current');
+    return false;
+  });  
+
   $('#logout').click(function(){
     WALLET.keys = [];
     $('#password').val('');
@@ -180,6 +187,7 @@ $(document).ready(function() {
     $('#your-addresses').hide();
     $('#tx').hide();
     $('#dashboard').hide();
+    $('#shuffle').hide();
   }
 
   function login_success()
@@ -204,6 +212,17 @@ $(document).ready(function() {
       $('#qrcode' + i).popover({ title: 'QRCode', html: true, content: qrcode, placement: 'bottom' });
     }
 
+    for(i = 0; i < WALLET.getKeys().length; i++)
+    {
+      
+      $(".shuffle-addresses tbody").append(makeShuffleAddressRow(i));
+
+      var shuffleAddr = WALLET.getKeys()[i].getAddress(NETWORK_VERSION).toString();
+      $('#shuffleAddress' + i).text(shuffleAddr);
+      var shuffleQrcode = makeQRCode(shuffleAddr);
+      $('#shuffleQrcode' + i).popover({ title: 'QRCode', html: true, content: shuffleQrcode, placement: 'bottom' });
+    }    
+
     txOnChangeSource();
 
     $('#faucet').click(faucetWithdrawal);
@@ -223,6 +242,16 @@ $(document).ready(function() {
     row += '</td></tr>';
     return row;
   }
+
+  function makeShuffleAddressRow(i){
+    //this should use a template engine or something, but we don't have one. 
+    //We could also rework this to clone a sample TR if we want to keep the layout in app.html
+    row = '<tr><td><code id="shuffleAddress'+i+'"></code></td> \
+           <td><span><strong id="shuffleBalance'+i+'"> </strong></span></td> \
+           <td><input type="button" id="requestShuffle" class="btn btn-default" style="width: 120px;" value="request shuffle">';
+    row += '</td></tr>';
+    return row;
+  }  
 
   function makeQRCode(addr) {
     var qr = qrcode(3, 'M');

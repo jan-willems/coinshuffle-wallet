@@ -55,6 +55,7 @@ var WALLET = new function ()
         var addr = addresses[i];
         var bal = addr.balance / 100000000.0;
         $('#balance' + i).text(bal);
+        $('#shuffleBalance' + i).text(bal);
       }
     });
   };

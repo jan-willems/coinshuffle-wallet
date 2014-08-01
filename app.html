@@ -10,11 +10,11 @@
     <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
     <!--if lt IE 9| @javascript html5shiv respond.min
     -->
-    <title>SF Bitcoin Devs HD Wallet - A Secure Hierarchial Deterministic Wallet</title>
+    <title>SF Bitcoin Devs Coinshuffle Wallet</title>
   </head>
   <body>
     <div id="logon" class="all-wrapper no-menu-wrapper">
-      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs HD Wallet</span></i></a></div>
+      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a></div>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
           <div class="content-wrapper bold-shadow">
@@ -73,7 +73,7 @@
       </div>
     </div>
     <div id="decrypt-url" class="all-wrapper no-menu-wrapper">
-      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs HD Wallet</span></i></a></div>
+      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a></div>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
           <div class="content-wrapper bold-shadow">
@@ -101,12 +101,13 @@
           <div class="text-center">
             <button type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="fa fa-bar"></span><span class="fa fafa fa-bar"></span><span class="fa fa-bar"></span></button>
           </div>
-          <div class="side-bar-wrapper collapse navbar-collapse navbar-ex1-collapse"><a href="#" class="logo hidden-sm hidden-xs"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs HD Wallet</span></i></a>
+          <div class="side-bar-wrapper collapse navbar-collapse navbar-ex1-collapse"><a href="#" class="logo hidden-sm hidden-xs"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a>
             <div class="relative-w">
               <ul class="side-menu">
                 <li class="current"><a id="your-dashboard-nav" href="#"><i class="fa fa-dashboard"></i>Dashboard</a></li>
                 <li><a id="your-addresses-nav" href="#"><i class="fa fa-bitcoin"></i>Public Addresses</a></li>
                 <li><a id="make-payment-nav" href="#"><span class="badge pull-right"></span><i class="fa fa-exchange"></i>Make Payment</a></li>
+                <li><a id="request-shuffle-nav" href="#"><span class="badge pull-right"></span><i class="fa fa-files-o"></i>Request Shuffle</a></li>
               </ul>
             </div>
           </div>
@@ -251,6 +252,26 @@
                   </div>
                 </div>
                 <!-- End of create payment screen-->
+                <!-- Start of shuffle screen-->
+                <div id="shuffle" class="widget">
+                  <h3 class="section-title first-title"><i class="fa fa-files-o"></i>Request Shuffle</h3>
+                  <div class="widget-content-white glossed">
+                    <div class="padded">
+                        <table class="table table-striped table-bordered table-hover datatable shuffle-addresses">
+                          <thead>
+                            <tr>
+                              <th>Bitcoin Address</th>
+                              <th>Balance</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                  </div>
+                </div>
+                <!-- End of shuffle screen-->
                 <div id="verifyModal" class="modal">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -328,6 +349,7 @@
     <script src="extjs/mnemonic.js"></script>
     <script src="extjs/electrum.js"></script>
     <script src="extjs/gibberish-aes-1.0.0.js"></script>
+    <script src="extjs/bitcore.js"></script>
     <script src="js/helloblock.js"></script>
     <script src="js/consts.js"></script>
     <script src="js/util.js"></script>
