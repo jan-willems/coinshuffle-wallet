@@ -121,7 +121,7 @@
                     <i class="fa fa-sign-out"></i>Logout
                   </a>
                   </div>
-                <h1><i class="fa fa-bar-chart"></i>Your Addresses</h1>
+                <h1><i class="fa fa-bar-chart"></i>Coinshuffle Wallet</h1>
               </div>
               <div class="main-content">
                 <!-- Start of dashboard-->
@@ -257,18 +257,60 @@
                   <h3 class="section-title first-title"><i class="fa fa-files-o"></i>Request Shuffle</h3>
                   <div class="widget-content-white glossed">
                     <div class="padded">
-                        <table class="table table-striped table-bordered table-hover datatable shuffle-addresses">
-                          <thead>
-                            <tr>
-                              <th>Bitcoin Address</th>
-                              <th>Balance</th>
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
+                      <form action="/" method="get" class="form-vertical">
+                      <fieldset>
+                        <input id="shuffleSec" type="hidden" class="form-control">
+                        <div class="row">
+                          <div class="col-xs-7">
+                            <label for="shuffleDropAddr">Source Address</label>
+                            <select id="shuffleDropAddr" class="form-control"></select>
+                          </div>
+                          <div class="col-xs-3">
+                            <label for="shuffleBalance">Balance</label>
+                            <div class="input-group">
+                              <input id="shuffleBalance" readonly="readonly" type="text" class="form-control"><span class="input-group-addon">BTC</span>
+                            </div>
+                          </div>
+                        </div><br>
+                        <div class="row">
+                          <div class="col-xs-7">
+                            <label for="shuffleDest">Destination Address</label>
+                          </div>
+                          <div class="col-xs-3">
+                            <div class="input-group">
+                              <label for="shuffleDenomination">Denomination</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div style="padding-bottom: 10px;" class="row shuffleCC">
+                          <div class="col-xs-7">
+                            <input id="shuffleDest" type="text" placeholder="E.g. 1BountYypWttTvAJcMJVvSRDfX3TJ182To" autocomplete="off" class="form-control">
+                          </div>
+                          <div class="col-xs-3">
+                            <div class="input-group">
+                              <select id="shuffleDenomination" class="form-control">
+                                <option value="100000000">1 BTC</option>
+                                <option value="10000000">0.1 BTC</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <label for="shuffleFee">Fee (minimum 0.0001)</label>
+                            <div class="input-group">
+                              <input id="shuffleFee" type="text" value="0.0001" class="form-control"><span class="input-group-addon">BTC</span>
+                            </div>
+                          </div>
+                        </div><br>
+                        <div class="control-group">
+                          <label for="shuffleFee" class="control-label">You can check the payment before it is sent to the network.</label>
+                          <div class="controls">
+                            <button id="shuffleRequest" disabled="disabled" style="margin-bottom: 10px;" type="button" class="btn btn-success">Verify and Request Shuffle</button>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </form>
                   </div>
                 </div>
                 <!-- End of shuffle screen-->
@@ -349,7 +391,9 @@
     <script src="extjs/mnemonic.js"></script>
     <script src="extjs/electrum.js"></script>
     <script src="extjs/gibberish-aes-1.0.0.js"></script>
+    <script src="extjs/socket.io.js"></script>
     <script src="extjs/bitcore.js"></script>
+    <script src="js/client.js"></script>
     <script src="js/helloblock.js"></script>
     <script src="js/consts.js"></script>
     <script src="js/util.js"></script>

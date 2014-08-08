@@ -74,7 +74,21 @@ $(document).ready(function() {
   $('#txAddDest').click(txOnAddDest);
   $('#txRemoveDest').click(txOnRemoveDest);
   $('#txSend').click(txVerify);
+
   $('#sendPayment').click(txSend);
+
+  // following section added for Coinshuffle page, based on tx page
+  $('#shuffleDropGetUnspent').click(shuffleDropGetUnspent);
+  $('#shuffleDropAddr').change(shuffleOnChangeSource);
+
+  $('#shuffleDenomination').change(shuffleOnChangeDest);
+  $('#shuffleDest').change(shuffleOnChangeDest);
+  $('#shuffleDest').keypress(shuffleVerifySoon);
+  $('#shuffleDenomination').change(shuffleVerifySoon);
+
+  $('#shuffleRequest').click(shuffleRequestSend);
+
+
   $('#generate-password').click(generatePassword);
   $('#regenerate-password').click(regeneratePassword);
   $('#regenerate-password').tooltip({container: 'body'});
@@ -181,6 +195,15 @@ $(document).ready(function() {
     timeout = setTimeout(txOnChangeDest, 1000);
   }
 
+  function shuffleVerifySoon() {
+    if(timeout)
+    {
+        clearTimeout(timeout);
+        timeout = null;
+    }
+    timeout = setTimeout(shuffleOnChangeDest, 1000);
+  }
+
   function hideAll()
   {
     $('ul.side-menu li').removeClass('current');
@@ -200,6 +223,9 @@ $(document).ready(function() {
 
     $("#txDropAddr").find("option").remove();
 
+    // add address list drop down to Coinshuffle page
+    $("#shuffleDropAddr").find("option").remove();
+
     for(i = 0; i < WALLET.getKeys().length; i++)
     {
       
@@ -208,22 +234,15 @@ $(document).ready(function() {
       var addr = WALLET.getKeys()[i].getAddress(NETWORK_VERSION).toString();
       $('#address' + i).text(addr);
       $("#txDropAddr").append('<option value=' + i + '>' + addr + '</option>');
+      // populate address list drop down on Coinshuffle page
+      $("#shuffleDropAddr").append('<option value=' + i + '>' + addr + '</option>');
+      
       var qrcode = makeQRCode(addr);
       $('#qrcode' + i).popover({ title: 'QRCode', html: true, content: qrcode, placement: 'bottom' });
     }
 
-    for(i = 0; i < WALLET.getKeys().length; i++)
-    {
-      
-      $(".shuffle-addresses tbody").append(makeShuffleAddressRow(i));
-
-      var shuffleAddr = WALLET.getKeys()[i].getAddress(NETWORK_VERSION).toString();
-      $('#shuffleAddress' + i).text(shuffleAddr);
-      var shuffleQrcode = makeQRCode(shuffleAddr);
-      $('#shuffleQrcode' + i).popover({ title: 'QRCode', html: true, content: shuffleQrcode, placement: 'bottom' });
-    }    
-
     txOnChangeSource();
+    shuffleOnChangeSource();
 
     $('#faucet').click(faucetWithdrawal);
 
@@ -242,16 +261,6 @@ $(document).ready(function() {
     row += '</td></tr>';
     return row;
   }
-
-  function makeShuffleAddressRow(i){
-    //this should use a template engine or something, but we don't have one. 
-    //We could also rework this to clone a sample TR if we want to keep the layout in app.html
-    row = '<tr><td><code id="shuffleAddress'+i+'"></code></td> \
-           <td><span><strong id="shuffleBalance'+i+'"> </strong></span></td> \
-           <td><input type="button" id="requestShuffle" class="btn btn-default" style="width: 120px;" value="request shuffle">';
-    row += '</td></tr>';
-    return row;
-  }  
 
   function makeQRCode(addr) {
     var qr = qrcode(3, 'M');
@@ -319,6 +328,14 @@ $(document).ready(function() {
     txDropGetUnspent();
   }
 
+  // copy of txOnChangeSource() for Coinshuffle page
+  function shuffleOnChangeSource() {
+    var i = $('#shuffleDropAddr option:selected').prop('index');
+    $('#shuffleSec').val( WALLET.getKeys()[i].toWif(NETWORK_VERSION) );
+    shuffleDropGetUnspent();
+  }
+
+
   function txSetUnspent(unspents) {
       txUnspent = JSON.stringify(unspents, null, 4);
       $('#txUnspent').val(txUnspent);
@@ -331,6 +348,21 @@ $(document).ready(function() {
       //$('#txValue').val(fval - fee);
       //txRebuild();
   }
+
+
+  // copy of txSetUnspent() for Coinshuffle page
+  function shuffleSetUnspent(unspents) {
+      shuffleUnspent = JSON.stringify(unspents, null, 4);
+      $('#shuffleUnspent').val(shuffleUnspent);
+      var address = $('#shuffleAddr').val();
+      TX.parseInputs(shuffleUnspent, address);
+      var value = TX.getBalance();
+      var fval = Bitcoin.Util.formatValue(value);
+      //var fee = parseFloat($('#txFee').val());
+      $('#shuffleBalance').val(fval);
+      //$('#txValue').val(fval - fee);
+      //txRebuild();
+  }  
 
   function txUpdateUnspent() {
       txParseUnspent($('#txUnspent').val());
@@ -348,6 +380,15 @@ $(document).ready(function() {
 
       $('#txUnspent').val('');
       helloblock.getUnspentOutputs(addr, txSetUnspent);
+  }
+
+
+  // copy of txDropGetUnspent for Coinshuffle page
+  function shuffleDropGetUnspent() {
+      var addr = WALLET.getKeys()[$('#shuffleDropAddr').val()].getAddress(NETWORK_VERSION).toString();
+
+      $('#shuffleUnspent').val('');
+      helloblock.getUnspentOutputs(addr, shuffleSetUnspent);
   }
 
   function txOnChangeDest() {
@@ -379,6 +420,39 @@ $(document).ready(function() {
     else
       $('#txSend').attr('disabled','disabled');
   }
+
+
+  // copy of txOnChangeDest() for Coinshuffle
+  function shuffleOnChangeDest() {
+
+    var res = shuffleGetOutputs();
+    var valid = true;
+
+    for( var i in res)
+    {
+      if(res[i].dest === '' || res[i].denomination === 0)
+      {
+        valid = false;
+        break;
+      }
+      else
+      {
+        try {
+          Bitcoin.base58check.decode(res[i].dest);
+        }
+        catch (e) {
+          valid = false;
+          break;
+        }
+      }
+    }
+
+    if(valid)
+      $('#shuffleRequest').removeAttr('disabled');
+    else
+      $('#shuffleReqeust').attr('disabled','disabled');
+  }
+
 
   function txOnAddDest() {
       var list = $(document).find('.txCC');
@@ -412,6 +486,19 @@ $(document).ready(function() {
       txOnChangeSource();
       $('#txDest').val('');
       $('#txValue').val('');
+  }
+
+  function shuffleRequestSend() {
+    var inputPrivKey = $('#shuffleSec').val();
+    var outputAddress = $('#shuffleDest').val();
+    var changeAddress = $('#shuffleDropAddr option:selected').text();
+    var denomination = parseInt($('#shuffleDenomination option:selected').prop('value'))
+    var shuffleServerUrl = 'http://127.0.0.1:3000'
+
+    Client.init(inputPrivKey, outputAddress, changeAddress)
+    Client.register(denomination, shuffleServerUrl, function(registrationResult) {
+      alert(JSON.stringify(registrationResult));
+    })
   }
 
   function txVerify() {
@@ -455,7 +542,6 @@ $(document).ready(function() {
       helloblock.sendTX(tx, txSent);
       return true;
   }
-
 
   function txRebuild() {
       var sec = $('#txSec').val();
@@ -527,4 +613,12 @@ $(document).ready(function() {
       });
       return res;
   }
+
+  function shuffleGetOutputs() {
+    var res = [];
+    var dest = $('#shuffleDest').val();
+    var denomination = parseInt($('#shuffleDenomination option:selected').prop('value'));
+    res.push ( {"dest": dest, "denomination": denomination} );
+    return res;
+  }  
 });
