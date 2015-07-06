@@ -68,9 +68,11 @@ var TX = new function () {
         return eckey.getAddress(NETWORK_VERSION).toString();
     }
 
+/* sets TX.balance and TX.inputs */
     this.parseInputs = function(text, address) {
         try {
-            var res = txParseHelloBlockUnspents(text, address);
+            //var res = txParseHelloBlockUnspents(text, address);
+            var res = txParseInsightUnspents(text, address);
         } catch(err) {
             var res = { "balance":"0" };
         }
@@ -118,6 +120,7 @@ var TX = new function () {
         return sendTx;
     };
 
+/* this instead needs to be converted to a bitcoin p2p format */
     this.toBBE = function(sendTx) {
         //serialize to Bitcoin Block Explorer format
         var buf = sendTx.serialize();
@@ -196,6 +199,36 @@ function txParseHelloBlockUnspents(data, address) {
         var script = dumpScript( new Bitcoin.Script(Bitcoin.convert.hexToBytes(o.scriptPubKey)) );
 
         var value = new Bitcoin.BigInteger('' + o.value, 10);
+        if (!(lilendHash in unspenttxs))
+            unspenttxs[lilendHash] = {};
+        unspenttxs[lilendHash][o.index] = {amount: value, script: script};
+        balance = balance.add(value);
+    }
+    return {balance:balance, unspenttxs:unspenttxs};
+}
+
+// replacement function for insight
+function txParseInsightUnspents(data, addr) {
+    var txs = JSON.parse(data);
+
+    if (!txs)
+        throw 'Unable to read Insight UTXOs';
+
+    delete unspenttxs;
+    var unspenttxs = {};
+    var balance = Bitcoin.BigInteger.ZERO;
+
+    for (var i in txs) {
+        var o = txs[i];
+        var lilendHash = o.txid;
+
+        //convert script back to BBE-compatible text
+        var script = dumpScript( new Bitcoin.Script(Bitcoin.convert.hexToBytes(o.scriptPubKey)) );
+
+	// Not sure if applicable here
+	// https://en.bitcoin.it/wiki/Proper_Money_Handling_(JSON-RPC)#ECMAScript
+	// Bitcore doesn't feature the "Unit" utility in this version yet
+        var value = new Bitcoin.BigInteger('' + (1e8 * o.amount), 10);
         if (!(lilendHash in unspenttxs))
             unspenttxs[lilendHash] = {};
         unspenttxs[lilendHash][o.index] = {amount: value, script: script};

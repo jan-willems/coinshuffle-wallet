@@ -12,10 +12,14 @@ var WALLET = new function ()
     return this.keys;
   };
 
+/* this fetches all BTC amounts from the public addr page (element: #balance-<addr>), adds them up */
   this.getBalance = function() {
+	//console.log(this.getKeys());
     balance = 0;
     for(i = 0; i < this.getKeys().length; i++) {
-      _b = parseFloat($('#balance' + i).text());
+	var addr = this.getKeys()[i].getAddress(NETWORK_VERSION).toString();
+	//console.log("getBalance addrs" + addr);
+      _b = parseFloat($('#balance-' + addr).text());
       if (!isNaN(_b)) {
         balance = balance + _b;
       }
@@ -43,6 +47,10 @@ var WALLET = new function ()
     }
   }
 
+/**
+ * This updates the "Balance" column on the "Public Addresses" page
+ *
+ */
   this.updateAllBalances = function() {
     var addresses = [];
     for(i = 0; i < this.getKeys().length; i++)
@@ -50,12 +58,14 @@ var WALLET = new function ()
       addresses[i] = this.getKeys()[i].getAddress(NETWORK_VERSION).toString();
     }
 
-    helloblock.retrieveAllBalances(addresses, function(addresses) {
-      for(i = 0; i < addresses.length; i++) {
-        var addr = addresses[i];
-        var bal = addr.balance / 100000000.0;
-        $('#balance' + i).text(bal);
-      }
-    });
+	
+	insight.retrieveAllBalances(addresses, function(addresses) {
+		console.log("return insight retrieve balances");
+		/* Ugh, no underscore available */
+		for (var address in addresses) {
+			//console.log("Addr amounts" + address);
+			$('#balance-' + address).text(addresses[address] / 100000000.0);
+		}
+	});
   };
 }

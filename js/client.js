@@ -50,17 +50,24 @@ var Client = new function() {
       denomination: denomination
     }
 
+    console.log("Shuffle request -> " + JSON.stringify(shuffleRequest));
+
     socket.emit('register', shuffleRequest)
+    console.log("Emitted 'register' with the request.");
     
     socket.on('registration_result', function (result) {
+      console.log("Received 'registration_result' " + JSON.stringify(result));
       callback(result)
     })
 
     socket.on('encrypt_output', function (pubKeys) {
+      console.log("Received 'encrypt_output' with pubKeys -> " + pubKeys);
+      console.log("Emitting 'encrypted_output'");
       socket.emit('encrypted_output', Client.encryptOutput(pubKeys, outputAddress))
     })
 
     socket.on('decrypt_and_shuffle_outputs', function (encOutputs) {
+      console.log("Received 'decrypt_and_shuffle_outputs' -> " + encOutputs);
       var partiallyDecryptedOutputs = []
 
       encOutputs.forEach(function (encOutput) {
@@ -71,33 +78,38 @@ var Client = new function() {
             partiallyDecryptedOutputs.push(decryptionResult)
           }
         } catch (err) {
-          //suppress decryption errors resulting frmo all clients trying to decrypt all outputs.
+          console.log("'decrypt_and_shuffle_outputs' error: " + err);
+          //suppress decryption errors resulting from all clients trying to decrypt all outputs.
         }
       })
 
       if (partiallyDecryptedOutputs.length > 0) {
         partiallyDecryptedOutputs = randomizeOrder(partiallyDecryptedOutputs)
+	console.log("Emitted 'partially_decrypted_outputs'.");
         socket.emit('partially_decrypted_outputs', partiallyDecryptedOutputs)
       }
     })
 
     var signingKey = inputPrivKey
     socket.on('request_transaction_signature', function (signatureRequest) {
+      console.log("Received 'request_transaction_signature' signatureRequest -> " + signatureRequest);
       var tx = TransactionBuilder.fromObj(JSON.parse(signatureRequest.transaction))
 
       if(signatureRequest.inputAddresses[signatureRequest.inputIndex] === inputAddress) {
         tx.sign([signingKey])
         socket.emit('transaction_input_signed', {'transaction': JSON.stringify(tx.toObj()), 'inputIndex': signatureRequest.inputIndex})
+        console.log("Emitted 'transaction_input_signed'.");
       }
     })
 
     socket.on('shuffle_complete', function() {
+      console.log("Received 'shuffle_complete'. Disconnecting.");
       disconnect(socket)
     })
   }  
 
   this.encryptOutput = function(pubKeys, output) {
-    console.log(output)
+    console.log("Called encryptOutput() pubKeys-> " + pubKeys + " output-> " + output);
 
     var encryptedOutput = new Buffer(output)
 
@@ -107,6 +119,8 @@ var Client = new function() {
       var encrypted = bitcore.ECIES.encrypt(pub, encryptedOutput)
       encryptedOutput = encrypted
     })
+
+    console.log("Returning encrypted output -> " + encryptedOutput);
 
     return encryptedOutput
   }  

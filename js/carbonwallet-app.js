@@ -1,5 +1,6 @@
 // Global, hmmm.
 var timeout;
+var config = new Config();
 
 $(document).ready(function() {
   $('#site').hide();
@@ -228,10 +229,9 @@ $(document).ready(function() {
 
     for(i = 0; i < WALLET.getKeys().length; i++)
     {
-      
-      $(".public-addresses tbody").append(makeAddressRow(i));
-
       var addr = WALLET.getKeys()[i].getAddress(NETWORK_VERSION).toString();
+      $(".public-addresses tbody").append(makeAddressRow(i, addr));
+
       $('#address' + i).text(addr);
       $("#txDropAddr").append('<option value=' + i + '>' + addr + '</option>');
       // populate address list drop down on Coinshuffle page
@@ -249,15 +249,18 @@ $(document).ready(function() {
     return false;
   }
 
-  function makeAddressRow(i){
+/* JWS: modified to let the element embed the address, for easier replacing of values */
+  function makeAddressRow(i, addr){
     //this should use a template engine or something, but we don't have one. 
     //We could also rework this to clone a sample TR if we want to keep the layout in app.html
     row = '<tr><td><code id="address'+i+'"></code></td> \
-           <td><span><strong id="balance'+i+'"> </strong></span></td> \
+           <td><span><strong id="balance-' + addr + '"> 0</strong> BTC</span></td> \
            <td><i id="qrcode'+i+'" class="btn btn-default fa fa-qrcode"></i>';
-            if (i==0 && USE_TESTNET){//add faucet
+	/*
+		if (i==0 && USE_TESTNET){//add faucet
               row += ' <input type="button" id="faucet" class="btn btn-default" style="width: 94px;" value="add coins">';
             }
+	*/
     row += '</td></tr>';
     return row;
   }
@@ -375,20 +378,32 @@ $(document).ready(function() {
       txSetUnspent(r);
   }
 
+/**
+ * Callback: txSetUnspent()
+ *
+ * txSetUnspent->TX.parseInputs->TX.txParseHelloBlockUnspents-> (return) {balance:balance, unspenttxs:unspenttxs}
+ * txSetUnspent also gets the balance for all UTXO's by using TX.getBalance() (and then formats it)
+ *
+ * Fetched from HelloBlock URL https://helloblock.io/docs/ref#addresses-unspents (value in satoshis)
+ */
   function txDropGetUnspent() {
       var addr = WALLET.getKeys()[$('#txDropAddr').val()].getAddress(NETWORK_VERSION).toString();
 
       $('#txUnspent').val('');
-      helloblock.getUnspentOutputs(addr, txSetUnspent);
+      //helloblock.getUnspentOutputs(addr, txSetUnspent);
+      insight.getUnspentOutputs(addr, txSetUnspent);
   }
 
 
+/* Callback: shuffleSetUnspent() */
   // copy of txDropGetUnspent for Coinshuffle page
   function shuffleDropGetUnspent() {
       var addr = WALLET.getKeys()[$('#shuffleDropAddr').val()].getAddress(NETWORK_VERSION).toString();
 
       $('#shuffleUnspent').val('');
-      helloblock.getUnspentOutputs(addr, shuffleSetUnspent);
+      //helloblock.getUnspentOutputs(addr, shuffleSetUnspent);
+      insight.getUnspentOutputs(addr, shuffleSetUnspent);
+
   }
 
   function txOnChangeDest() {
@@ -493,7 +508,8 @@ $(document).ready(function() {
     var outputAddress = $('#shuffleDest').val();
     var changeAddress = $('#shuffleDropAddr option:selected').text();
     var denomination = parseInt($('#shuffleDenomination option:selected').prop('value'))
-    var shuffleServerUrl = 'http://127.0.0.1:3000'
+    //var shuffleServerUrl = 'http://127.0.0.1:3000'
+    var shuffleServerUrl = "http://" + config.shuffle_host + ":" + config.shuffle_port;
 
     Client.init(inputPrivKey, outputAddress, changeAddress)
     Client.register(denomination, shuffleServerUrl, function(registrationResult) {

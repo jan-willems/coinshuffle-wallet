@@ -10,11 +10,11 @@
     <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
     <!--if lt IE 9| @javascript html5shiv respond.min
     -->
-    <title>SF Bitcoin Devs Coinshuffle Wallet</title>
+    <title>Coinshuffle Wallet</title>
   </head>
   <body>
     <div id="logon" class="all-wrapper no-menu-wrapper">
-      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a></div>
+      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>Coinshuffle Wallet</span></i></a></div>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
           <div class="content-wrapper bold-shadow">
@@ -73,7 +73,7 @@
       </div>
     </div>
     <div id="decrypt-url" class="all-wrapper no-menu-wrapper">
-      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a></div>
+      <div class="login-logo-w"><a href="#" class="logo"><i class="fa fa-cloud-download"><span>Coinshuffle Wallet</span></i></a></div>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
           <div class="content-wrapper bold-shadow">
@@ -101,7 +101,7 @@
           <div class="text-center">
             <button type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="fa fa-bar"></span><span class="fa fafa fa-bar"></span><span class="fa fa-bar"></span></button>
           </div>
-          <div class="side-bar-wrapper collapse navbar-collapse navbar-ex1-collapse"><a href="#" class="logo hidden-sm hidden-xs"><i class="fa fa-cloud-download"><span>SF Bitcoin Devs Coinshuffle Wallet</span></i></a>
+          <div class="side-bar-wrapper collapse navbar-collapse navbar-ex1-collapse"><a href="#" class="logo hidden-sm hidden-xs"><i class="fa fa-cloud-download"><span>Coinshuffle Wallet</span></i></a>
             <div class="relative-w">
               <ul class="side-menu">
                 <li class="current"><a id="your-dashboard-nav" href="#"><i class="fa fa-dashboard"></i>Dashboard</a></li>
@@ -134,10 +134,10 @@
                         <div class="col-lg-3 col-md-4 col-sm-6 text-center">
                           <div class="widget-content-blue-wrapper changed-up">
                             <div class="widget-content-blue-inner padded">
-                              <div class="pre-value-block"><i class="icon-dashboard"></i>BTC Price</div>
+                              <div class="pre-value-block"><i class="icon-dashboard"></i>Block Height</div>
                               <div class="value-block">
-                                <div id="btc-price" class="value-self">Loading..</div>
-                                <div class="value-sub">24 Hour Average</div>
+                                <div id="btc-block-height" class="value-self">Loading..</div>
+                                <div class="value-sub">Total blocks</div>
                               </div>
                             </div>
                           </div>
@@ -156,10 +156,10 @@
                         <div class="col-lg-3 col-md-4 col-sm-6 text-center">
                           <div class="widget-content-blue-wrapper changed-up">
                             <div class="widget-content-blue-inner padded">
-                              <div class="pre-value-block"><i class="icon-money"></i>Dollar Balance</div>
+                              <div class="pre-value-block"><i class="icon-money"></i>Mining difficulty</div>
                               <div class="value-block">
-                                <div id="dollar-balance" class="value-self">Loading..</div>
-                                <div class="value-sub">24 Hour Average</div>
+                                <div id="mining-difficulty" class="value-self">Loading..</div>
+                                <div class="value-sub">Difficulty</div>
                               </div>
                             </div>
                           </div>
@@ -396,6 +396,8 @@
     <script src="js/client.js"></script>
     <script src="js/helloblock.js"></script>
     <script src="js/consts.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/insight.js"></script>
     <script src="js/util.js"></script>
     <script src="js/tx.js"></script>
     <script src="js/wallet.js"></script>
